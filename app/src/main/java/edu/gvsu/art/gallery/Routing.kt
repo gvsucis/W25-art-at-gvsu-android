@@ -30,6 +30,7 @@ object Route {
     const val SearchArtistDetail = "search/artists/{artist_id}"
     const val SearchArtworkDetail = "search/artworks/{artwork_id}"
     const val Settings = "browse/settings"
+    const val AISearch = "search/ai"
 }
 
 sealed class TabScreen(
@@ -103,6 +104,10 @@ fun NavController.navigateToTour(tourID: String, displayName: String) =
 
 fun NavController.navigateToCollection(collection: ArtworkCollection) =
     navigate("browse/collections/${collection.slug}")
+
+fun NavController.navigateToAISearch() =
+    navigate("AISearchScreen")
+
 
 internal class ArtworkCollectionArgs(val collection: ArtworkCollection) {
     constructor(savedStateHandle: SavedStateHandle) :
