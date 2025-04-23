@@ -1,6 +1,7 @@
 package edu.gvsu.art.gallery.ui
 
 import android.content.Intent
+import android.graphics.Bitmap
 import android.net.Uri
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
 import androidx.camera.core.CameraSelector
@@ -49,6 +50,7 @@ import com.google.accompanist.permissions.rememberPermissionState
 import edu.gvsu.art.gallery.BuildConfig
 import edu.gvsu.art.gallery.R
 import edu.gvsu.art.gallery.lib.Links
+import edu.gvsu.art.gallery.navigateToAISearch
 import edu.gvsu.art.gallery.navigateToArtistDetail
 import edu.gvsu.art.gallery.navigateToArtworkDetail
 import edu.gvsu.art.gallery.ui.foundation.LocalTabScreen
@@ -61,6 +63,7 @@ fun SearchIndexScreen(navController: NavController) {
     val (query, setQuery) = rememberSaveable { mutableStateOf("") }
     val (selectedModel, setModel) = rememberSaveable { mutableStateOf(SearchCategory.ARTIST) }
     val (isQRDialogOpen, openQRDialog) = remember { mutableStateOf(false) }
+    val (capturedImage, setCapturedImage) = remember { mutableStateOf<Bitmap?>(null) }
 
     Scaffold(
         topBar = {
@@ -74,6 +77,12 @@ fun SearchIndexScreen(navController: NavController) {
                     setCategory = setModel,
                     selectQRScanner = {
                         openQRDialog(true)
+                    },
+                    onImageCaptured = { bitmap ->
+                        if (bitmap != null) {
+                            setCapturedImage(bitmap)
+                            navController.navigateToAISearch()
+                        }
                     }
                 )
             }

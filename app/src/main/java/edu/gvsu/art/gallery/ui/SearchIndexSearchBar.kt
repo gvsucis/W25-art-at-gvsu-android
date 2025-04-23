@@ -1,5 +1,10 @@
 package edu.gvsu.art.gallery.ui
 
+import android.graphics.Bitmap
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.launch
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,8 +24,10 @@ import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -41,9 +48,15 @@ fun SearchIndexSearchBar(
     setQuery: (String) -> Unit,
     setCategory: (SearchCategory) -> Unit,
     selectQRScanner: () -> Unit,
+    onImageCaptured: (Bitmap?) -> Unit,
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val options = listOf(SearchCategory.ARTIST, SearchCategory.ARTWORK)
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicturePreview()
+    ) { bitmap: Bitmap? ->
+        onImageCaptured(bitmap)
+    }
 
     Column {
         Row {
@@ -59,7 +72,7 @@ fun SearchIndexSearchBar(
                         tint = MaterialTheme.colorScheme.onSurface,
                     )
                 },
-                trailingIcon = {
+                trailingIcon = @Composable {
                     if (query.isNotEmpty()) {
                         IconButton(onClick = { setQuery("") }) {
                             Icon(
@@ -69,14 +82,24 @@ fun SearchIndexSearchBar(
                             )
                         }
                     } else {
-                        IconButton(
-                            onClick = { selectQRScanner() }
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(1.dp)
                         ) {
-                            Icon(
-                                Icons.Default.QrCodeScanner,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onSurface,
-                            )
+                            TextButton(
+                                onClick = { cameraLauncher.launch() }
+                            ) {
+                                Text("AI", color = Color.Blue)
+                            }
+                            IconButton(
+                                onClick = { selectQRScanner() }
+                            ) {
+                                Icon(
+                                    Icons.Default.QrCodeScanner,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.onSurface,
+                                )
+                            }
                         }
                     }
                 },
@@ -124,6 +147,7 @@ fun SearchBarPreview() {
             setQuery = {},
             setCategory = {},
             selectQRScanner = {},
+            onImageCaptured = {},
         )
     }
 }
